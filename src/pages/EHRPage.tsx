@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAuthUser, getUserById, isAuthenticated } from '@/utils/authUtils';
 import { loadEHRs, Patient, EHR } from '@/utils/csvUtils';
 import { ArrowLeft, Plus, Edit } from 'lucide-react';
+import ChatbotWithEHR from '@/components/ChatbotWithEHR';
 
 const EHRPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
@@ -23,7 +23,6 @@ const EHRPage = () => {
   const [isEditEHROpen, setIsEditEHROpen] = useState(false);
   
   useEffect(() => {
-    // Check if user is authenticated as a doctor
     if (!isAuthenticated()) {
       navigate('/login');
       return;
@@ -35,18 +34,15 @@ const EHRPage = () => {
       return;
     }
     
-    // Load patient and EHRs
     if (patientId) {
       const foundPatient = getUserById(patientId) as Patient | null;
       
       if (foundPatient && foundPatient.role === 'patient') {
         setPatient(foundPatient);
         
-        // Load EHRs for this patient
         const fetchedEHRs = loadEHRs();
         const patientEHRs = fetchedEHRs.filter(ehr => ehr.patientId === patientId);
         
-        // Sort by date (newest first)
         patientEHRs.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
@@ -55,7 +51,6 @@ const EHRPage = () => {
         
         setEHRs(patientEHRs);
       } else {
-        // Patient not found or not a patient
         toast({
           title: "Patient Not Found",
           description: "The requested patient could not be found.",
@@ -67,11 +62,9 @@ const EHRPage = () => {
   }, [patientId, navigate, toast]);
   
   const handleEHRCreated = () => {
-    // Reload EHRs
     const fetchedEHRs = loadEHRs();
     const patientEHRs = fetchedEHRs.filter(ehr => ehr.patientId === patientId);
     
-    // Sort by date (newest first)
     patientEHRs.sort((a, b) => {
       const dateA = new Date(a.date);
       const dateB = new Date(b.date);
@@ -169,92 +162,109 @@ const EHRPage = () => {
           </CardContent>
         </Card>
         
-        {ehrs.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <p className="text-healthcare-gray mb-4">No health records found for this patient.</p>
-              <Button onClick={() => setIsNewEHROpen(true)}>
-                <Plus className="mr-2 h-4 w-4" /> Create First Health Record
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            <Tabs defaultValue={ehrs[0].id}>
-              <TabsList className="w-full flex overflow-x-auto">
-                {ehrs.map((ehr, index) => (
-                  <TabsTrigger key={ehr.id} value={ehr.id} className="flex-shrink-0">
-                    {ehr.date} {index === 0 && "(Latest)"}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              
-              {ehrs.map((ehr) => (
-                <TabsContent key={ehr.id} value={ehr.id}>
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                      <div>
-                        <CardTitle>Medical Record - {ehr.date}</CardTitle>
-                        <CardDescription>Created by Dr. {getAuthUser()?.name}</CardDescription>
-                      </div>
-                      <Dialog open={isEditEHROpen && selectedEHR === ehr.id} onOpenChange={(open) => {
-                        setIsEditEHROpen(open);
-                        if (open) {
-                          setSelectedEHR(ehr.id);
-                        } else {
-                          setSelectedEHR(null);
-                        }
-                      }}>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="icon">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-lg">
-                          <DialogHeader>
-                            <DialogTitle>Edit EHR for {patient.name}</DialogTitle>
-                          </DialogHeader>
-                          <EHRForm 
-                            patient={patient} 
-                            ehrId={ehr.id} 
-                            onSave={handleEHRCreated} 
-                          />
-                        </DialogContent>
-                      </Dialog>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <h3 className="font-medium text-healthcare-blue">Diagnosis</h3>
-                        <p className="mt-1">{ehr.diagnosis}</p>
-                      </div>
-                      
-                      {ehr.prescription && (
-                        <div>
-                          <h3 className="font-medium text-healthcare-blue">Prescription</h3>
-                          <p className="mt-1 whitespace-pre-line">{ehr.prescription}</p>
-                        </div>
-                      )}
-                      
-                      {ehr.notes && (
-                        <div>
-                          <h3 className="font-medium text-healthcare-blue">Clinical Notes</h3>
-                          <p className="mt-1 whitespace-pre-line">{ehr.notes}</p>
-                        </div>
-                      )}
-                      
-                      {ehr.followUp && (
-                        <div>
-                          <h3 className="font-medium text-healthcare-blue">Follow-up</h3>
-                          <p className="mt-1">{ehr.followUp}</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        )}
+        <Tabs defaultValue="ehr" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="ehr">Health Records</TabsTrigger>
+            <TabsTrigger value="chat">AI Assistant</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="ehr">
+            {ehrs.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <p className="text-healthcare-gray mb-4">No health records found for this patient.</p>
+                  <Button onClick={() => setIsNewEHROpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" /> Create First Health Record
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                <Tabs defaultValue={ehrs[0].id}>
+                  <TabsList className="w-full flex overflow-x-auto">
+                    {ehrs.map((ehr, index) => (
+                      <TabsTrigger key={ehr.id} value={ehr.id} className="flex-shrink-0">
+                        {ehr.date} {index === 0 && "(Latest)"}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                  
+                  {ehrs.map((ehr) => (
+                    <TabsContent key={ehr.id} value={ehr.id}>
+                      <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                          <div>
+                            <CardTitle>Medical Record - {ehr.date}</CardTitle>
+                            <CardDescription>Created by Dr. {getAuthUser()?.name}</CardDescription>
+                          </div>
+                          <Dialog open={isEditEHROpen && selectedEHR === ehr.id} onOpenChange={(open) => {
+                            setIsEditEHROpen(open);
+                            if (open) {
+                              setSelectedEHR(ehr.id);
+                            } else {
+                              setSelectedEHR(null);
+                            }
+                          }}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="icon">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-lg">
+                              <DialogHeader>
+                                <DialogTitle>Edit EHR for {patient.name}</DialogTitle>
+                              </DialogHeader>
+                              <EHRForm 
+                                patient={patient} 
+                                ehrId={ehr.id} 
+                                onSave={handleEHRCreated} 
+                              />
+                            </DialogContent>
+                          </Dialog>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <h3 className="font-medium text-healthcare-blue">Diagnosis</h3>
+                            <p className="mt-1">{ehr.diagnosis}</p>
+                          </div>
+                          
+                          {ehr.prescription && (
+                            <div>
+                              <h3 className="font-medium text-healthcare-blue">Prescription</h3>
+                              <p className="mt-1 whitespace-pre-line">{ehr.prescription}</p>
+                            </div>
+                          )}
+                          
+                          {ehr.notes && (
+                            <div>
+                              <h3 className="font-medium text-healthcare-blue">Clinical Notes</h3>
+                              <p className="mt-1 whitespace-pre-line">{ehr.notes}</p>
+                            </div>
+                          )}
+                          
+                          {ehr.followUp && (
+                            <div>
+                              <h3 className="font-medium text-healthcare-blue">Follow-up</h3>
+                              <p className="mt-1">{ehr.followUp}</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="chat">
+            <Card>
+              <CardContent className="py-6">
+                <ChatbotWithEHR patient={patient} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </Layout>
   );

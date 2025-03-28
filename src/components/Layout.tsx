@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <footer className="bg-healthcare-light-gray py-6">
         <div className="healthcare-container">
           <div className="text-center">
-            <p className="text-healthcare-gray">© {new Date().getFullYear()} DocuHealth. All rights reserved.</p>
+            <p className="text-healthcare-gray">© {new Date().getFullYear()} CuraMate. All rights reserved.</p>
             <div className="mt-2 flex justify-center space-x-6">
               <a href="#" className="text-healthcare-blue hover:text-healthcare-purple transition-colors">Privacy Policy</a>
               <a href="#" className="text-healthcare-blue hover:text-healthcare-purple transition-colors">Terms of Service</a>

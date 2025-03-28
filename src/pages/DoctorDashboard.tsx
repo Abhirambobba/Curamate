@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,9 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import PatientCard from '@/components/PatientCard';
 import EHRForm from '@/components/EHRForm';
 import ChatbotInterface from '@/components/ChatbotInterface';
+import ChatbotWithEHR from '@/components/ChatbotWithEHR';
 import { getAuthUser, getUserByEmail, isAuthenticated } from '@/utils/authUtils';
 import { Patient, Appointment, EHR, getPatients, loadEHRs, loadAppointments } from '@/utils/csvUtils';
-import { Search, Plus, Calendar } from 'lucide-react';
+import { Search, Plus, Calendar, MessageSquare } from 'lucide-react';
 
 const DoctorDashboard = () => {
   const { toast } = useToast();
@@ -27,7 +27,6 @@ const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState('patients');
   
   useEffect(() => {
-    // Check if user is authenticated as a doctor
     if (!isAuthenticated()) {
       navigate('/login');
       return;
@@ -39,7 +38,6 @@ const DoctorDashboard = () => {
       return;
     }
     
-    // Load data
     loadData();
   }, [navigate]);
   
@@ -51,7 +49,6 @@ const DoctorDashboard = () => {
     const user = getAuthUser();
     
     if (user) {
-      // Filter appointments for this doctor
       const doctorAppointments = fetchedAppointments.filter(
         appointment => appointment.doctorId === user.id
       );
@@ -89,7 +86,6 @@ const DoctorDashboard = () => {
   const handleAddPatient = () => {
     if (!searchResult) return;
     
-    // In a real app, we would create an association between doctor and patient
     toast({
       title: "Patient Added",
       description: `${searchResult.name} has been added to your patient list.`,
@@ -99,7 +95,6 @@ const DoctorDashboard = () => {
     loadData();
   };
   
-  // Filter upcoming appointments (today and future)
   const upcomingAppointments = appointments.filter(appointment => {
     const appointmentDate = new Date(appointment.date);
     const today = new Date();
@@ -107,7 +102,6 @@ const DoctorDashboard = () => {
     return appointmentDate >= today && appointment.status !== 'cancelled';
   });
   
-  // Sort appointments by date and time
   upcomingAppointments.sort((a, b) => {
     const dateA = new Date(`${a.date} ${a.time}`);
     const dateB = new Date(`${b.date} ${b.time}`);
@@ -233,12 +227,31 @@ const DoctorDashboard = () => {
                                   <p className="text-sm mt-2">{appointment.reason}</p>
                                 )}
                               </div>
-                              <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                appointment.status === 'confirmed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {appointment.status === 'confirmed' ? 'Confirmed' : 'Pending'}
+                              <div className="flex items-center gap-2">
+                                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  appointment.status === 'confirmed' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {appointment.status === 'confirmed' ? 'Confirmed' : 'Pending'}
+                                </div>
+                                {patient && (
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                        <MessageSquare className="h-4 w-4 mr-1" /> Chat
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-4xl h-[80vh]">
+                                      <DialogHeader>
+                                        <DialogTitle>Chat with {patient.name}</DialogTitle>
+                                      </DialogHeader>
+                                      <div className="h-full pt-2">
+                                        <ChatbotWithEHR patient={patient} />
+                                      </div>
+                                    </DialogContent>
+                                  </Dialog>
+                                )}
                               </div>
                             </div>
                           </CardContent>

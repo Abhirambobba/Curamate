@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from '@/utils/csvUtils';
@@ -40,7 +39,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <span className="text-2xl font-bold text-healthcare-blue">
-                DocuHealth
+                CuraMate
               </span>
             </Link>
           </div>
