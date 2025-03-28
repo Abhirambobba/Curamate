@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -10,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getAuthUser, getUserById, isAuthenticated } from '@/utils/authUtils';
 import { loadEHRs, Patient, EHR } from '@/utils/csvUtils';
 import { ArrowLeft, Plus, Edit } from 'lucide-react';
-import ChatbotWithEHR from '@/components/ChatbotWithEHR';
+import ChatbotInterface from '@/components/ChatbotInterface';
 
 const EHRPage = () => {
   const { patientId } = useParams<{ patientId: string }>();
@@ -260,7 +261,7 @@ const EHRPage = () => {
           <TabsContent value="chat">
             <Card>
               <CardContent className="py-6">
-                <ChatbotWithEHR patient={patient} />
+                <ChatbotInterface />
               </CardContent>
             </Card>
           </TabsContent>

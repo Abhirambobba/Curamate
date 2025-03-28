@@ -29,8 +29,8 @@ const App = () => (
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
           <Route path="/ehr/:patientId" element={<EHRPage />} />
-          <Route path="/schedule/:patientId" element={<EHRPage />} /> {/* Redirect to EHR for now */}
-          <Route path="/message/:patientId" element={<EHRPage />} /> {/* Redirect to EHR for now */}
+          <Route path="/schedule/:patientId" element={<EHRPage />} /> 
+          <Route path="/message/:patientId" element={<EHRPage />} /> 
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
