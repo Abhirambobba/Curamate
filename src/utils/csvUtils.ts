@@ -152,3 +152,9 @@ export const saveEHRs = (ehrs: EHR[]): void => {
 export const loadEHRs = (): EHR[] => {
   return loadFromCSV(EHR_KEY);
 };
+
+// Add getPatients function to csvUtils
+export const getPatients = (): Patient[] => {
+  const users = loadUsers();
+  return users.filter(u => u.role === 'patient') as Patient[];
+};
