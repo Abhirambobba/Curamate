@@ -12,7 +12,6 @@ import Register from "./pages/Register";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
 import EHRPage from "./pages/EHRPage";
-import MapPage from "./pages/MapPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,7 +31,6 @@ const App = () => (
           <Route path="/ehr/:patientId" element={<EHRPage />} />
           <Route path="/schedule/:patientId" element={<EHRPage />} /> 
           <Route path="/message/:patientId" element={<EHRPage />} /> 
-          <Route path="/map" element={<MapPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
