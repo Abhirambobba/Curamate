@@ -1,0 +1,9 @@
+[server]
+headless = true
+runOnSave = true
+browserServerAddress = ""
+browserServerPort = ""
+enableCORS = false
+enableXsrfProtection = false
+openBrowser = false
+base= "light"
