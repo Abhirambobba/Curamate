@@ -1,3 +1,4 @@
+
 /**
  * CSV utility functions for handling local storage of user data
  * Since we're using browser storage, we'll simulate "files" using localStorage
@@ -157,4 +158,10 @@ export const loadEHRs = (): EHR[] => {
 export const getPatients = (): Patient[] => {
   const users = loadUsers();
   return users.filter(u => u.role === 'patient') as Patient[];
+};
+
+// Add getDoctors function to csvUtils if not already present
+export const getDoctors = (): Doctor[] => {
+  const users = loadUsers();
+  return users.filter(u => u.role === 'doctor') as Doctor[];
 };

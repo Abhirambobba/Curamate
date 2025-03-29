@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getAuthUser, setAuthUser, isAuthenticated } from '@/utils/authUtils';
-import { User } from '@/utils/csvUtils';
+import { User, Patient, Doctor } from '@/utils/csvUtils';
 
 const Profile = () => {
   const { toast } = useToast();
@@ -39,10 +39,12 @@ const Profile = () => {
       setContactNumber(authUser.contactNumber || '');
       
       if (authUser.role === 'doctor') {
-        setSpecialization(authUser.specialization || '');
-      } else {
-        setDateOfBirth(authUser.dateOfBirth || '');
-        setBloodGroup(authUser.bloodGroup || '');
+        const doctorUser = authUser as Doctor;
+        setSpecialization(doctorUser.specialization || '');
+      } else if (authUser.role === 'patient') {
+        const patientUser = authUser as Patient;
+        setDateOfBirth(patientUser.dateOfBirth || '');
+        setBloodGroup(patientUser.bloodGroup || '');
       }
     }
   }, [navigate]);
@@ -50,18 +52,26 @@ const Profile = () => {
   const handleSave = () => {
     if (!user) return;
     
-    const updatedUser = {
-      ...user,
-      name,
-      email,
-      contactNumber: contactNumber || undefined,
-      ...(user.role === 'doctor' ? {
+    let updatedUser: User;
+    
+    if (user.role === 'doctor') {
+      updatedUser = {
+        ...user,
+        name,
+        email,
+        contactNumber: contactNumber || undefined,
         specialization: specialization || undefined,
-      } : {
+      } as Doctor;
+    } else {
+      updatedUser = {
+        ...user,
+        name,
+        email,
+        contactNumber: contactNumber || undefined,
         dateOfBirth: dateOfBirth || undefined,
         bloodGroup: bloodGroup || undefined,
-      }),
-    };
+      } as Patient;
+    }
     
     // In a real application, we would save this to the backend
     // For now, we'll just update the local state
@@ -205,7 +215,7 @@ const Profile = () => {
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p className="p-2 border rounded-md">{user.specialization || 'Not specified'}</p>
+                      <p className="p-2 border rounded-md">{(user as Doctor).specialization || 'Not specified'}</p>
                     )}
                   </div>
                 </div>
@@ -221,7 +231,7 @@ const Profile = () => {
                         onChange={(e) => setDateOfBirth(e.target.value)}
                       />
                     ) : (
-                      <p className="p-2 border rounded-md">{user.dateOfBirth || 'Not provided'}</p>
+                      <p className="p-2 border rounded-md">{(user as Patient).dateOfBirth || 'Not provided'}</p>
                     )}
                   </div>
                   
@@ -244,7 +254,7 @@ const Profile = () => {
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p className="p-2 border rounded-md">{user.bloodGroup || 'Not provided'}</p>
+                      <p className="p-2 border rounded-md">{(user as Patient).bloodGroup || 'Not provided'}</p>
                     )}
                   </div>
                 </div>
