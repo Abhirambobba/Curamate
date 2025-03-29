@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User } from '@/utils/csvUtils';
@@ -9,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Menu, User as UserIcon, LogOut } from 'lucide-react';
+import { Menu, User as UserIcon, LogOut, Map } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -66,26 +67,38 @@ const Navbar: React.FC = () => {
             </Link>
             
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="ml-4">
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    {user.name}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link to={getDashboardLink()}>Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <>
+                <Link
+                  to="/map"
+                  className="px-3 py-2 text-healthcare-gray hover:text-healthcare-blue transition-colors flex items-center"
+                >
+                  <Map className="h-4 w-4 mr-1" />
+                  Map
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="ml-4">
+                      <UserIcon className="mr-2 h-4 w-4" />
+                      {user.name}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem asChild>
+                      <Link to={getDashboardLink()}>Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">Profile</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/map">Location Map</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" asChild>
@@ -150,6 +163,14 @@ const Navbar: React.FC = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
+                </Link>
+                <Link
+                  to="/map"
+                  className="block px-3 py-2 text-healthcare-gray hover:text-healthcare-blue transition-colors flex items-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Map className="h-4 w-4 mr-1" />
+                  Location Map
                 </Link>
                 <button
                   onClick={() => {
