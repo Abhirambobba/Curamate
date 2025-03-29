@@ -8,11 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Doctor, getDoctors } from '@/utils/csvUtils';
 import { Search, UserPlus } from 'lucide-react';
+import { isAuthenticated } from '@/utils/authUtils';
+import { useToast } from '@/hooks/use-toast';
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDoctors = () => {
@@ -27,6 +30,20 @@ const Doctors = () => {
     doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (doctor.specialization && doctor.specialization.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const handleBookAppointment = () => {
+    if (!isAuthenticated()) {
+      toast({
+        title: "Authentication Required",
+        description: "Please login or register to book an appointment",
+        variant: "destructive"
+      });
+      navigate('/login');
+      return;
+    }
+    
+    navigate('/schedule');
+  };
 
   return (
     <Layout>
@@ -90,7 +107,7 @@ const Doctors = () => {
                   <CardFooter className="bg-healthcare-light-gray p-4 flex justify-center">
                     <Button 
                       variant="outline"
-                      onClick={() => navigate('/schedule')}
+                      onClick={handleBookAppointment}
                       className="w-full"
                     >
                       Book Appointment

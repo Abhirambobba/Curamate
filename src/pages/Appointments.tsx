@@ -38,6 +38,7 @@ const Appointments = () => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
 
   useEffect(() => {
+    // Check authentication immediately when component mounts
     if (!isAuthenticated()) {
       toast({
         title: "Authentication Required",
